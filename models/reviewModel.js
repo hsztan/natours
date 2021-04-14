@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { prependListener } = require('./userModel');
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -31,6 +32,20 @@ const reviewSchema = new mongoose.Schema(
     toObject: { virtuals: true }
   }
 );
+
+//QUERY MIDDLEWARE
+
+reviewSchema.pre(/^find/, function(next) {
+  this.populate({
+    path: 'tour',
+    select: '-guides name'
+  }).populate({
+    path: 'user',
+    select: 'name photo'
+  });
+
+  next();
+});
 
 const Review = mongoose.model('Review', reviewSchema);
 
